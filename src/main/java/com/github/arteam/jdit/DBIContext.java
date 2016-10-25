@@ -117,7 +117,7 @@ public class DBIContext {
             DataMigration dataMigration = new DataMigration(handle);
             URL resource = getClass().getClassLoader().getResource(schemaLocation);
             if (resource == null) {
-                throw new IllegalArgumentException("File '" + schemaLocation + " is not exist in resources");
+                throw new IllegalArgumentException("File '" + schemaLocation + "' does not exist in resources");
             }
             File file = new File(resource.getFile());
             if (file.isFile()) {
