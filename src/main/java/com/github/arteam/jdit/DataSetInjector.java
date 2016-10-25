@@ -2,7 +2,12 @@ package com.github.arteam.jdit;
 
 import com.github.arteam.jdit.annotations.DataSet;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.stream.Stream;
 
 /**
  * Date: 2/1/15
@@ -36,9 +41,22 @@ class DataSetInjector {
         DataSet methodDataSet = method.getAnnotation(DataSet.class);
         DataSet actualDataSet = methodDataSet != null ? methodDataSet : classLevelDataSet;
         if (actualDataSet != null) {
-            String[] scriptLocations = actualDataSet.value() != null ? actualDataSet.value() : new String[]{};
-            for (String location : scriptLocations) {
-                dataMigration.executeScript(location);
+            if (actualDataSet.value().length > 0) {
+                String[] scriptLocations = actualDataSet.value();
+                for (String location : scriptLocations) {
+                    dataMigration.executeScript(location);
+                }
+            } else if (!actualDataSet.directory().isEmpty()) {
+                try {
+                    Files
+                            .list(Paths.get(actualDataSet.directory()))
+                            .filter(path -> path.endsWith(".sql"))
+                            .map(String::valueOf)
+                            .sorted()
+                            .forEach(x -> dataMigration.executeScript(x.replace("src/main/resources/", "")));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }

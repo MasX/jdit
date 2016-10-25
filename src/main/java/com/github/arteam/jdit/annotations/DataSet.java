@@ -23,5 +23,7 @@ public @interface DataSet {
      *
      * @return the location of the data set files
      */
-    String[] value();
+    String[] value() default {};
+
+    String directory() default "";
 }
